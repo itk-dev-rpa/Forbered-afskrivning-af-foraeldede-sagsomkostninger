@@ -1,11 +1,11 @@
+import multiprocessing
+import glob
+import os
+from tempfile import TemporaryDirectory
 from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
 from ITK_dev_shared_components.SAP import multi_session
 from auxiliary import TemporaryFile, get_fp_and_aftale_from_file
 from excel_process import read_sheet
-import os
-from tempfile import TemporaryDirectory
-import multiprocessing
-import glob
 from sql_transactions import Database
 import config
 
@@ -35,7 +35,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         # get list of file paths from glob
         excel_files = glob.glob(f'{temp_dir}/*.xlsx')
 
-        with multiprocessing.Pool(processes=config.MULTIPROCESSING_CONCURRENCY) as pool:  # TODO identify optimal pool size on worker pc
+        with multiprocessing.Pool(processes=config.MULTIPROCESSING_CONCURRENCY) as pool:
             results = pool.map(read_sheet, excel_files)
 
         sagsomkostninger = []

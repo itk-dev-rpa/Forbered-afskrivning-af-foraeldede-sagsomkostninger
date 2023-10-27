@@ -115,10 +115,8 @@ if __name__ == "__main__":
     Merge results in a single file.
     """
     import multiprocessing
-    import warnings
     import glob
     import time
-    import openpyxl
 
     warnings.filterwarnings("ignore", category=UserWarning)
     PATH = r"C:\Users\az27355\Downloads\OneDrive_2023-09-06\Midlertidige filer"
