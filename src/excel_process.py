@@ -25,42 +25,41 @@ def read_sheet(path: str) -> list[tuple[str, str, str]]:
     rows = ws.values
 
     header_row = next(rows)
-    get_index = lambda column_name: header_row.index(column_name)
-
+    
     hovedstole = []
     sagsomkostninger = []
     sag_indholdsart = []
 
     for row in rows:
         # Step 2: Delete rows where Medhæfter is not empty
-        if row[get_index('Medhæfter')] != None:
+        if row[header_row.index('Medhæfter')] != None:
             continue
 
         # Step 3: Delete row if RIM Aftale is MO and RIM aftalestatus is 28
-        if row[get_index('RIM Aftale')] == 'MO' and row[get_index('RIM aftalestatus')] == '28':
+        if row[header_row.index('RIM Aftale')] == 'MO' and row[header_row.index('RIM aftalestatus')] == '28':
             continue
 
         # Step 4: Delete rows where RIM Aftale == 'IN' and RIM aftalestatus == 21
-        if row[get_index('RIM Aftale')] == 'IN' and row[get_index('RIM aftalestatus')] == '21':
+        if row[header_row.index('RIM Aftale')] == 'IN' and row[header_row.index('RIM aftalestatus')] == '21':
             continue
 
         # Step 5: Slet rækker hvor indholdsart er på listen (e.g. BØVO.)
-        if row[get_index('Indholdsart')] in REMOVE_INDHOLDSART:
+        if row[header_row.index('Indholdsart')] in REMOVE_INDHOLDSART:
             continue
 
         # Step 6: Delete rows where Aftale type is not empty
-        if row[get_index('Aftale type')] != None:
+        if row[header_row.index('Aftale type')] != None:
             continue
 
         # Step 7: new lists
 
         # Step 8: Move rows with ZGBY or ZREN to sagsomkostninger
-        if row[get_index('Hovedtransakt.')] in ('ZGBY', 'ZREN'):
+        if row[header_row.index('Hovedtransakt.')] in ('ZGBY', 'ZREN'):
             sagsomkostninger.append(row)
             continue
 
         # Step 9: Move rows with Ratespecifikation LRT to sagsomkostnigner.
-        if row[get_index('Ratespecifikation')] == 'LRT':
+        if row[header_row.index('Ratespecifikation')] == 'LRT':
             sagsomkostninger.append(row)
         else:  # Step 10: remaining rows, I.E. all, where Ratespecifikation is not LRT goes to hovedstole.
             hovedstole.append(row)
@@ -68,7 +67,7 @@ def read_sheet(path: str) -> list[tuple[str, str, str]]:
         # exit loop
 
     # Step 11: Delete row from sagsomkostninger if "RykkespærÅrsag" is 'N'.
-    sagsomkostninger = [row for row in sagsomkostninger if row[get_index('RykkespærÅrsag')] != 'N']
+    sagsomkostninger = [row for row in sagsomkostninger if row[header_row.index('RykkespærÅrsag')] != 'N']
 
     # Step 12: Delete row from sagsomkostninger if Forældelse is None or later than today.
     def _expirey_date_passed(date):
@@ -80,22 +79,22 @@ def read_sheet(path: str) -> list[tuple[str, str, str]]:
 
         return True
 
-    sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row[get_index('Forældelsesdato')])]
+    sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row[header_row.index('Forældelsesdato')])]
 
     # Step 13: Move rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to sag_indholdsart
     index = 0
     while index < len(sagsomkostninger):
-        if sagsomkostninger[index][get_index('Indholdsart')] in ['DAGI', 'DAG2', 'SFO2']:
+        if sagsomkostninger[index][header_row.index('Indholdsart')] in ['DAGI', 'DAG2', 'SFO2']:
             # remove row from sagsomkostninger
             sag_indholdsart.append(sagsomkostninger.pop(index))
         else:
             index += 1  # Move to the next item in the list
     # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
-    right = set([(row[get_index('ForretnPartner')], row[get_index('Aftale')]) for row in hovedstole])
+    right = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
     # remove rows from sagsomkostninger that do not have matching (FP, aftale) i hovedstole.
     sagsomkostninger = [row for row in sagsomkostninger if
-                        (row[get_index('ForretnPartner')], row[get_index('Aftale')]) not in right]
+                        (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in right]
 
     # Step 15: Combine lists
     sagsomkostninger.extend(sag_indholdsart)
@@ -105,7 +104,7 @@ def read_sheet(path: str) -> list[tuple[str, str, str]]:
     print(f"Done processing {path}.")
 
     # reduce to three rows: Aftale, Bilagsnummer, FP
-    return [(row[get_index('Aftale')], row[get_index('Bilagsnummer')], row[get_index('ForretnPartner')]) for row in
+    return [(row[header_row.index('Aftale')], row[header_row.index('Bilagsnummer')], row[header_row.index('ForretnPartner')]) for row in
             sagsomkostninger]
 
 
