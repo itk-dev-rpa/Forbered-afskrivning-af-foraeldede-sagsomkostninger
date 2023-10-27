@@ -1,13 +1,12 @@
 import traceback
 import sys
-
 from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
-
 import initialize
 import get_constants
 import reset
 import error_screenshot
 import process
+
 
 def main():
     orchestrator_connection = OrchestratorConnection.create_connection_from_args()
