@@ -10,6 +10,4 @@ CREATE_TABLE_QUERY = """(
 );
 """
 
-ODBC_DATETIME_FORMAT = '%Y-%d-%m %H:%M:%S'
-
 MULTIPROCESSING_CONCURRENCY = 8  # use this many cores
