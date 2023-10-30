@@ -1,4 +1,4 @@
-TABLE_NAME = "temp_fosa_job_queue"
+TABLE_NAME = "fosa_job_queue"
 CREATE_TABLE_QUERY = """(
     id INT IDENTITY(1,1) PRIMARY KEY,
     aftale VARCHAR(20) NOT NULL,
