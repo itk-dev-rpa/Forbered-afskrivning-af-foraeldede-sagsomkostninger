@@ -75,12 +75,12 @@ class Database():
 
     def get_new_row(self) -> pyodbc.Row | None:
         """
-        Get a new job, change its status from 'new' to 'in progress'
-        Returns: a single Row object with status 'new'. If no 'new' rows are available, the method returns empty list.
+        Get a new job, change its status from 'New' to 'in progress'
+        Returns: a single Row object with status 'New'. If no 'new' rows are available, the method returns empty list.
         """
         query = (Query
                  .from_(self.table)
-                 .where(self.table.status == 'new')
+                 .where(self.table.status == 'New')
                  .select('*')
                  )
 
