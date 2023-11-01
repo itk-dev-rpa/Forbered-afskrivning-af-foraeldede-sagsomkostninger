@@ -2,7 +2,7 @@ import warnings
 import datetime
 import openpyxl
 
-REMOVE_INDHOLDSART = ("BØVO", "EJEN", "BYGS", "BYGB", "MERE", "MERU", "BUMR")
+REMOVE_INDHOLDSART = ("BØVO", "EJEN", "BYGS", "BYGB", "MERE", "MERU", "BUMR" ,"PLAL", "PLFL", "KAAL","KAFL")
 
 # suppress warnings from openpyxl. E.g. "Cell R13023 is marked as a date but the serial value -693596 is outside the limits for dates. The cell will be treated as an error."
 warnings.filterwarnings("ignore", category=UserWarning)
