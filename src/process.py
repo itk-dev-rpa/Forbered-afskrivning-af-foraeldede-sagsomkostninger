@@ -1,4 +1,3 @@
-import multiprocessing
 import glob
 import os
 from tempfile import TemporaryDirectory
@@ -35,14 +34,9 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         # get list of file paths from glob
         excel_files = glob.glob(f'{temp_dir}/*.xlsx')
 
-        with multiprocessing.Pool(processes=config.MULTIPROCESSING_CONCURRENCY) as pool:
-            results = pool.map(read_sheet, excel_files)
+        sagsomkostninger = read_sheet(excel_files)
 
-        sagsomkostninger = []
-        for sheet in results:
-            sagsomkostninger.extend(sheet)
-        del results
-        # delete tempdir containing excel files
+    # tempdir is deleted.
 
     # Step 3. Get rykkerspærre from SAP
     file_content = get_sap_file_content()
