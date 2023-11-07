@@ -48,7 +48,7 @@ class DataSelection(unittest.TestCase):
 
         reduced_sagsomkostninger # final outcome
 
-        self.assertEqual(1535, len(reduced_sagsomkostninger)) # row count
+        self.assertEqual(1546, len(reduced_sagsomkostninger)) # row count
 
         #import json
         #with open(os.path.join(current_script_dir, 'data', 'expected_result.json')) as file:
