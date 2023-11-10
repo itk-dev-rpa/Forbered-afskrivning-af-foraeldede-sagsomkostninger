@@ -4,3 +4,10 @@
 # Framework requirements
 OpenOrchestratorConnection
 Pillow
+
+# project requirements
+ITK-dev-shared-components >= 0.0.6
+openpyxl <= 3.1.2
+OpenOrchestratorConnection <= 0.0.10
+PyPika <= 0.48.9
+pyodbc <= 4.0.39

@@ -3,8 +3,8 @@ from email.message import EmailMessage
 import os
 import base64
 import traceback
-
 from PIL import ImageGrab
+
 
 def send_error_screenshot(to_address: str | list[str], exception:Exception, process_name:str):
     # Create message
@@ -44,10 +44,3 @@ def send_error_screenshot(to_address: str | list[str], exception:Exception, proc
     with smtplib.SMTP("smtp.aarhuskommune.local", 25) as smtp:
         smtp.starttls()
         smtp.send_message(msg)
-
-
-if __name__ == '__main__':
-    try:
-        raise ValueError("Oh no!")
-    except Exception as e:
-        send_error_screenshot("ghbm@aarhus.dk", e, "Test proc")
