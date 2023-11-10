@@ -1,6 +1,6 @@
 import traceback
 import sys
-from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
+from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 import initialize
 import get_constants
 import reset

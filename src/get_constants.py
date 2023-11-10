@@ -1,4 +1,4 @@
-from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
+from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 
 
 class Constants:

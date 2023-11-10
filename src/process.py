@@ -1,7 +1,7 @@
 import glob
 import os
 from tempfile import TemporaryDirectory
-from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
+from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from ITK_dev_shared_components.SAP import multi_session
 from auxiliary import TemporaryFile, get_fp_and_aftale_from_file
 from excel_process import read_sheet

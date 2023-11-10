@@ -1,4 +1,4 @@
-from OpenOrchestratorConnection.orchestrator_connection import OrchestratorConnection
+from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from ITK_dev_shared_components.SAP import sap_login
 
 def reset(orchestrator_connection:OrchestratorConnection) -> None:
