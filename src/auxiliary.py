@@ -1,3 +1,4 @@
+"""Module for support methods that could be reused in other parts of the library"""
 import tempfile
 import os
 import atexit
@@ -13,6 +14,7 @@ class TemporaryFile:
         atexit.register(self.clean_up)
 
     def clean_up(self) -> None:
+        """Delete the file"""
         os.remove(self.file.name)
 
     def __repr__(self) -> str:
