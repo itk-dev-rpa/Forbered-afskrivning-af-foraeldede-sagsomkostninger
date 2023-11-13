@@ -6,6 +6,7 @@ import get_constants
 import reset
 import error_screenshot
 import process
+import config
 
 
 def main():

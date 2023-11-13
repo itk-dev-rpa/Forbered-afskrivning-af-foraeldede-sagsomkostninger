@@ -1,13 +1,12 @@
 import glob
 import os
+import json
 from tempfile import TemporaryDirectory
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from ITK_dev_shared_components.SAP import multi_session
 from auxiliary import TemporaryFile, get_fp_and_aftale_from_file
 from excel_process import read_sheet
-from sql_transactions import Database
 import config
-
 
 def process(orchestrator_connection: OrchestratorConnection) -> None:
 
@@ -19,8 +18,6 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     4. Filter excel output
     5. Insert results into job queue.
     """
-    # Step 0. Connect to database
-    db = Database(table_name=config.TABLE_NAME, connection_string='Driver={ODBC Driver 17 for SQL Server};Server=SRVSQLHOTEL03;Database=MKB-ITK-RPA;Trusted_Connection=yes;')
     # TODO Step 1. GRAPH get emails
 
     # Step 2. Treat excel files according to alteryx rules
@@ -57,7 +54,11 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         reduced_sagsomkostninger.append(row)  # row not in rykkerspærrer.
 
     # Step 5. Insert results into job queue.
-    db.insert_many_rows(reduced_sagsomkostninger)
+    reference_list = [None]*len(reduced_sagsomkostninger)
+    reduced_sagsomkostninger = [json.dumps(dict(zip(['aftale', 'bilagsnummer', 'fp'], row)))
+                                for row in reduced_sagsomkostninger]
+    orchestrator_connection.bulk_create_queue_elements(queue_name=config.QUEUE_NAME, data=reduced_sagsomkostninger,
+                                                       references=reference_list)
 
 
 def get_sap_file_content() -> str:
