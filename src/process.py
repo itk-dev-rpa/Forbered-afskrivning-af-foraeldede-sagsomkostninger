@@ -66,11 +66,13 @@ def process(orchestrator_connection: OrchestratorConnection, constants: Constant
 
 
 def get_sap_file_content() -> str:
+    """Download rykkerspærre from SAP as a file and return content as a string.
+    The file is automatically deleted.
+
+    Returns:
+            Rykkerspærre as a string.
+    """
     session = multi_session.get_all_sap_sessions()[0]
-    """
-    Download rykkerspærre from SAP as a file and return content as a string.
-    The file is automatically deleted.                    
-    """
 
     session.startTransaction("fplka")
     # set spærType = 51
@@ -107,7 +109,13 @@ def get_emails(orchestrator_connection: OrchestratorConnection, graph_access: au
     """Search for emails from KMD and download attachments.
     Filter the emails to the ones with Excel restancelister attached.
     The expected file name format is '20231024RPA03_23_23.XLSX'->(date, name, file count, .XLSX).
-    Do a validation by counting the number of emails
+
+    Returns:
+        A tuple; lists of downloaded attachments and emails.
+
+    Raises:
+        BusinessError: When no emails were found.
+        ValueError: When attachments are missing.
     """
     mails = mail.get_emails_from_folder('itk-rpa@mkb.aarhus.dk', 'Indbakke/Afskrivning af forældede sagsomkostninger', graph_access)
 
