@@ -9,7 +9,7 @@ Part one of the procedure https://github.com/itk-dev-rpa/Afskrivning-af-foraelde
 ## Testing 
 Run from terminal as python process
 ```bash
-python src\framework.py "test_fosa_forbered" "<connection string>" "<secret key>" "my_args"
+python main.py "test_fosa_forbered" "<connection string>" "<secret key>" "args"
 ```
 
 ## Requirements
