@@ -43,7 +43,7 @@ def main():
             orchestrator_connection.log_error(f"Error caught during process. Number of errors caught: {error_count}. {error_type}: {error}\nTrace: {traceback.format_exc()}")
             error_screenshot.send_error_screenshot(constants.error_email, error, orchestrator_connection.process_name)
 
-    
+
     reset.clean_up(orchestrator_connection)
     reset.close_all(orchestrator_connection)
     reset.kill_all(orchestrator_connection)

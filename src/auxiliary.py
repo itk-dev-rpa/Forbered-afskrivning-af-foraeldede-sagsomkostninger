@@ -9,7 +9,7 @@ class TemporaryFile:
     The file will automatically be deleted (at exit), even if an uncaught exception occurs.
     """
     def __init__(self):
-        self.file = tempfile.NamedTemporaryFile(delete=False)
+        self.file = tempfile.NamedTemporaryFile(delete=False)  # pylint: disable=(consider-using-with)
         self.file.close()
         atexit.register(self.clean_up)
 

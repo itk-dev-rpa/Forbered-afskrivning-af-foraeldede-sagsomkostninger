@@ -1,8 +1,7 @@
+"""Read Excel files and extract cases for the SAP process."""
 import warnings
 import datetime
 import openpyxl
-import config
-import multiprocessing
 
 REMOVE_INDHOLDSART = ("BØVO", "EJEN", "BYGS", "BYGB", "MERE", "MERU", "BUMR" ,"PLAL", "PLFL", "KAAL","KAFL")
 
@@ -21,14 +20,14 @@ def _load_excel_files(path):
 
 
 def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
-    """
-    This method reads all Excel files and applies the "Alteryx" filtering steps described in the PDD section 5.2.
+    """This method reads all Excel files and applies the "Alteryx" filtering steps described in the PDD section 5.2.
     The KMD restanceliste from KMD, is reduced to a list of (Aftale, Bilagsnummer, FP)
 
     Args:
         paths: path to all Excel file
 
-    Returns: Filtered rows from the Excel files.
+    Returns:
+        Filtered rows from the Excel files.
     """
 
     results = []
@@ -49,7 +48,7 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
 
     for row in rows:
         # Step 2: Delete rows where Medhæfter is not empty
-        if row[header_row.index('Medhæfter')] != None:
+        if row[header_row.index('Medhæfter')] is not None:
             continue
 
         # Step 3: Delete row if RIM Aftale is MO and RIM aftalestatus is 28
@@ -62,7 +61,7 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
             continue
 
         # Step 6: Delete rows where Aftale type is not empty
-        if row[header_row.index('Aftale type')] != None:
+        if row[header_row.index('Aftale type')] is not None:
             continue
 
         # Step 7: new lists
@@ -85,7 +84,7 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
 
     # Step 12: Delete row from sagsomkostninger if Forældelse is None or later than today.
     def _expirey_date_passed(date):
-        if date == None:
+        if date is None:
             return False
 
         if date > datetime.datetime.today():
@@ -105,6 +104,7 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
             index += 1  # Move to the next item in the list
     # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
+    # pylint: disable-next=(consider-using-set-comprehension)
     right = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
     # remove rows from sagsomkostninger that do not have matching (FP, aftale) i hovedstole.
     sagsomkostninger = [row for row in sagsomkostninger if
@@ -118,30 +118,10 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
     for row in sagsomkostninger:
         if row[header_row.index('RIM Aftale')] == 'IN' and row[header_row.index('RIM aftalestatus')] == '21':
             continue
-        else:
-            _sagsomkostninger.append(row)
+        _sagsomkostninger.append(row)
 
     sagsomkostninger = _sagsomkostninger
 
     # reduce to three rows: Aftale, Bilagsnummer, FP
     return [(row[header_row.index('Aftale')], row[header_row.index('Bilagsnummer')], row[header_row.index('ForretnPartner')]) for row in
             sagsomkostninger]
-
-
-if __name__ == "__main__":
-    """
-    Load excel files from dir.
-    Extract data from excel files and perform Alteryx steps.
-    Merge results in a single file.
-    """
-
-    import glob
-    import time
-
-    warnings.filterwarnings("ignore", category=UserWarning)
-    PATH = r"C:\Users\az27355\OneDrive - Aarhus kommune\pycharmProjects\Forbered-afskrivning-af-foraeldede-sagsomkostninger\src\tests\data\excel"
-    excel_files = glob.glob(f'{PATH}/*.xlsx')
-
-    start = time.time()
-    sagsomkostninger = read_sheet(excel_files)
-    print(f"runtime {time.time() - start}. Rows:{len(sagsomkostninger)}")

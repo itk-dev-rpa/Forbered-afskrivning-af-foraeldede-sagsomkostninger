@@ -21,7 +21,7 @@ def send_error_screenshot(to_address: str | list[str], exception:Exception, proc
     with open("screenshot.png", "rb") as img_file:
         screenshot_data = img_file.read()
         screenshot_base64 = base64.b64encode(screenshot_data).decode('utf-8')
-    
+
     # Delete screenshot
     os.remove('screenshot.png')
 
