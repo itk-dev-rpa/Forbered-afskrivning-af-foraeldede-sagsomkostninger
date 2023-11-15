@@ -1,5 +1,5 @@
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from ITK_dev_shared_components.SAP import sap_login
+from itk_dev_shared_components.sap import sap_login
 
 def reset(orchestrator_connection:OrchestratorConnection) -> None:
     """Clean up, close/kill all programs and start them again. """

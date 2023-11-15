@@ -31,8 +31,9 @@ def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
     Returns: Filtered rows from the Excel files.
     """
 
-    with multiprocessing.Pool(processes=config.MULTIPROCESSING_CONCURRENCY) as pool:
-        results = pool.map(_load_excel_files, paths)
+    results = []
+    for path in paths:
+        results.append(_load_excel_files(path))
 
 
     header_row = results[0][1]

@@ -29,13 +29,12 @@ def main():
             reset.reset(orchestrator_connection)
 
             orchestrator_connection.log_trace("Running process.")
-            process.process(orchestrator_connection)
+            process.process(orchestrator_connection, constants)
 
             break
 
         except BusinessError as error:
             orchestrator_connection.log_error(f"BusinessError: {error}\nTrace: {traceback.format_exc()}")
-            error_screenshot.send_error_screenshot(constants.error_email, error, orchestrator_connection.process_name)
             break
 
         except Exception as error:

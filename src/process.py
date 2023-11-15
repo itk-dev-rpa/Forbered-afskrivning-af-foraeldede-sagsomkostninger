@@ -1,39 +1,38 @@
-import glob
 import os
 import json
-from tempfile import TemporaryDirectory
+import io
+
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from ITK_dev_shared_components.SAP import multi_session
 from auxiliary import TemporaryFile, get_fp_and_aftale_from_file
 from excel_process import read_sheet
 import config
+from itk_dev_shared_components.sap import multi_session
+from itk_dev_shared_components.graph import authentication, mail
+from get_constants import Constants
+from framework import BusinessError
 
-def process(orchestrator_connection: OrchestratorConnection) -> None:
 
+def process(orchestrator_connection: OrchestratorConnection, constants: Constants) -> None:
     """
-    0. Initialize database connection
+    0. Establish Graph access
     1. GRAPH get emails
     2. Treat excel files according to alteryx rules
     3. Get rykkerspærre from SAP
     4. Filter excel output
-    5. Insert results into job queue.
+    5. Insert results into job queue
+    6. Delete emails
     """
-    # TODO Step 1. GRAPH get emails
+    gc = constants.graph_credentials
+    graph_access = authentication.authorize_by_username_password(username=gc.username, **json.loads(gc.password))
+
+    # Step 1. GRAPH get emails
+    attachment_bytes_list, kmd_emails = get_emails(orchestrator_connection, graph_access)
 
     # Step 2. Treat excel files according to alteryx rules
-    # TODO make temp dir and delete it when done.
-    with TemporaryDirectory() as temp_dir:
-        # save excel files here
-        # graph.save.files.here(temp_dir)
-        print("warning. importing files from hard coded path.")
-        temp_dir = r"C:\Users\az27355\Downloads\restancelister_20231024\Midlertidige filer"  # TODO DELETE
+    sagsomkostninger = read_sheet(attachment_bytes_list)
 
-        # get list of file paths from glob
-        excel_files = glob.glob(f'{temp_dir}/*.xlsx')
-
-        sagsomkostninger = read_sheet(excel_files)
-
-    # tempdir is deleted.
+    for att in attachment_bytes_list:
+        att.close()
 
     # Step 3. Get rykkerspærre from SAP
     file_content = get_sap_file_content()
@@ -43,7 +42,6 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     # Step 4. Filter excel output
     # delete row from sagsomkostninger of fp and aftale is in rykkersprre dict.
     reduced_sagsomkostninger = []
-
     for row in sagsomkostninger:
         restance_aftale = row[0]
         restance_fp = row[2]
@@ -59,10 +57,16 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
                                 for row in reduced_sagsomkostninger]
     orchestrator_connection.bulk_create_queue_elements(queue_name=config.QUEUE_NAME, data=reduced_sagsomkostninger,
                                                        references=reference_list)
+    orchestrator_connection.log_trace(f"Inserted {len(reduced_sagsomkostninger)} job queue elements.")
+
+    # Step 6. Delete emails.
+    for email in kmd_emails:
+        mail.delete_email(email, graph_access, permanent=False)
+        orchestrator_connection.log_trace(f"Deleted email '{email.subject}' (received {email.received_time}).")
 
 
 def get_sap_file_content() -> str:
-    session = multi_session.get_all_SAP_sessions()[0]
+    session = multi_session.get_all_sap_sessions()[0]
     """
     Download rykkerspærre from SAP as a file and return content as a string.
     The file is automatically deleted.                    
@@ -97,3 +101,31 @@ def get_sap_file_content() -> str:
     with open(str(tempfile)) as file:  # blocking until SAP is done writing
         data = file.read()
     return data
+
+
+def get_emails(orchestrator_connection: OrchestratorConnection, graph_access: authentication.GraphAccess) -> tuple[list[io.BytesIO],list[mail.Email]]:
+    """Search for emails from KMD and download attachments.
+    Filter the emails to the ones with Excel restancelister attached.
+    The expected file name format is '20231024RPA03_23_23.XLSX'->(date, name, file count, .XLSX).
+    Do a validation by counting the number of emails
+    """
+    mails = mail.get_emails_from_folder('itk-rpa@mkb.aarhus.dk', 'Indbakke/Afskrivning af forældede sagsomkostninger', graph_access)
+
+    kmd_mails = [email for email in mails if
+                 email.has_attachments and email.subject.startswith('Liste til forældede sagsomkostninger') and email.sender == 'kan-ikke-besvares@kmd.dk']
+
+    if not kmd_mails:
+        raise BusinessError("No matching emails were found.")
+
+    attachments = [mail.list_email_attachments(message, graph_access)[0] for message in kmd_mails]
+
+    latest_file_date = sorted([att.name for att in attachments])[-1][:8]
+    latest_attachments = [att.name for att in attachments if att.name.startswith(latest_file_date)]
+
+    if len(latest_attachments) != latest_attachments[0][-7:-5]:
+        raise ValueError(f"The number of attachments did not correspond with the number that is embedded in the filename. List of attached files: {latest_attachments}")
+
+    orchestrator_connection.log_trace(f"Downloading {len(latest_attachments)} excel attachments with date {latest_file_date}.")
+    attachment_bytes_list = [mail.get_attachment_data(attachment, graph_access) for attachment in attachments]
+
+    return attachment_bytes_list, kmd_mails
