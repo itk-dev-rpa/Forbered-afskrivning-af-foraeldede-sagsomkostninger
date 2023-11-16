@@ -1,6 +1,7 @@
 """Read Excel files and extract cases for the SAP process."""
-import warnings
 import datetime
+from io import BytesIO
+import warnings
 import openpyxl
 
 REMOVE_INDHOLDSART = ("BØVO", "EJEN", "BYGS", "BYGB", "MERE", "MERU", "BUMR" ,"PLAL", "PLFL", "KAAL","KAFL")
@@ -16,10 +17,10 @@ def _load_excel_files(path):
     header_row = next(rows)
     rows = list(rows)  # convert to list, because generator cannot be pickled
 
-    return (rows, header_row)
+    return rows, header_row
 
-
-def read_sheet(paths: list[str]) -> list[tuple[str, str, str]]:
+# pylint: disable=(too-many-branches)
+def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     """This method reads all Excel files and applies the "Alteryx" filtering steps described in the PDD section 5.2.
     The KMD restanceliste from KMD, is reduced to a list of (Aftale, Bilagsnummer, FP)
 

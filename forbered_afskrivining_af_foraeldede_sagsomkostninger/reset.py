@@ -22,4 +22,3 @@ def kill_all(orchestrator_connection:OrchestratorConnection) -> None:
 def open_all(orchestrator_connection:OrchestratorConnection) -> None:
     credentials = orchestrator_connection.get_credential("Anders SAP")
     sap_login.login_using_cli(credentials.username,credentials.password)
-    pass

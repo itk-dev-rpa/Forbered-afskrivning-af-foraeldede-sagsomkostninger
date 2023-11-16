@@ -1,15 +1,16 @@
+"""The main process where data is prepared and inserted in the queue."""
 import os
 import json
 import io
 
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from auxiliary import TemporaryFile, get_fp_and_aftale_from_file
-from excel_process import read_sheet
-import config
 from itk_dev_shared_components.sap import multi_session
 from itk_dev_shared_components.graph import authentication, mail
-from get_constants import Constants
-from framework import BusinessError
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.auxiliary import TemporaryFile, get_fp_and_aftale_from_file
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.excel_process import read_sheet
+from forbered_afskrivining_af_foraeldede_sagsomkostninger import config
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.get_constants import Constants
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.framework import BusinessError
 
 
 def process(orchestrator_connection: OrchestratorConnection, constants: Constants) -> None:
@@ -45,7 +46,7 @@ def process(orchestrator_connection: OrchestratorConnection, constants: Constant
     for row in sagsomkostninger:
         restance_aftale = row[0]
         restance_fp = row[2]
-        if restance_fp in fp_aftale.keys():
+        if restance_fp in fp_aftale:
             if restance_aftale in fp_aftale[restance_fp]:
                 continue  # Skip row: the fp, aftale combo is in rykkerspærrer.
 
@@ -100,7 +101,7 @@ def get_sap_file_content() -> str:
     # save data to file
     session.findById('/app/con[0]/ses[0]/wnd[1]/tbar[0]/btn[11]').press()
 
-    with open(str(tempfile)) as file:  # blocking until SAP is done writing
+    with open(str(tempfile), encoding='cp1252') as file:  # blocking until SAP is done writing
         data = file.read()
     return data
 

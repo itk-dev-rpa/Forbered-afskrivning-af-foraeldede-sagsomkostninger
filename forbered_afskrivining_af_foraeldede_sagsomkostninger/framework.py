@@ -1,12 +1,11 @@
 import traceback
 import sys
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-import initialize
-import get_constants
-import reset
-import error_screenshot
-import process
-import config
+from forbered_afskrivining_af_foraeldede_sagsomkostninger import initialize
+from forbered_afskrivining_af_foraeldede_sagsomkostninger  import get_constants
+from forbered_afskrivining_af_foraeldede_sagsomkostninger  import reset
+from forbered_afskrivining_af_foraeldede_sagsomkostninger  import error_screenshot
+from forbered_afskrivining_af_foraeldede_sagsomkostninger  import process
 
 
 def main():

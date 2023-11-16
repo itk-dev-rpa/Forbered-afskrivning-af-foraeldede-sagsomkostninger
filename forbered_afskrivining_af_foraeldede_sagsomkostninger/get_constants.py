@@ -1,6 +1,4 @@
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-import json
-
 
 class Constants:
     """Define your constants."""
