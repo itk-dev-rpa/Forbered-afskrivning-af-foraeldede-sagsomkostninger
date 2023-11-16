@@ -13,7 +13,7 @@ python main.py "test_fosa_forbered" "<connection string>" "<secret key>" "args"
 ```
 
 ## Requirements
-Minimum python version 3.10
+Minimum python version 3.11
 
 ## Flow
 
