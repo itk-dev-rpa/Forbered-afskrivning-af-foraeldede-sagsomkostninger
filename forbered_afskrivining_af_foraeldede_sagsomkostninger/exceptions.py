@@ -1,3 +1,4 @@
 """Common exception for the framework"""
 class BusinessError(Exception):
-    pass
+    """Raise this in the primary process when business rules need to abort a task."""
+    pass  # pylint: disable=(unnecessary-pass)
