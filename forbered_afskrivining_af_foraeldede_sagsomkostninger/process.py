@@ -132,8 +132,7 @@ def get_emails(orchestrator_connection: OrchestratorConnection, graph_access: au
     latest_attachments = [att.name for att in attachments if att.name.startswith(latest_file_date)]
 
     if len(latest_attachments) != latest_attachments[0][-7:-5]:
-        print('raise ValueError(f"The number of attachments did not correspond with the number that is embedded in the filename. List of attached files: {latest_attachments}")')  # TODO delete
-        # raise ValueError(f"The number of attachments did not correspond with the number that is embedded in the filename. List of attached files: {latest_attachments}")
+        raise ValueError(f"The number of attachments did not correspond with the number that is embedded in the filename. List of attached files: {latest_attachments}")
 
     orchestrator_connection.log_trace(f"Downloading {len(latest_attachments)} excel attachments with date {latest_file_date}.")
     attachment_bytes_list = [mail.get_attachment_data(attachment, graph_access) for attachment in attachments]
