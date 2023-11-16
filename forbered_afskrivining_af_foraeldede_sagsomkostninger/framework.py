@@ -54,9 +54,5 @@ def log_exception(orchestrator_connection: OrchestratorConnection) -> callable:
     return inner
 
 
-class BusinessError(Exception):
-    pass
-
-
 if __name__ == '__main__':
     main()
