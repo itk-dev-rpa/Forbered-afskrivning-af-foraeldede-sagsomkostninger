@@ -84,7 +84,8 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     sagsomkostninger = [row for row in sagsomkostninger if row[header_row.index('RykkespærÅrsag')] != 'N']
 
     # Step 12: Delete row from sagsomkostninger if Forældelse is None or later than today.
-    def _expirey_date_passed(date):
+    def _expirey_date_passed(row):
+        date = row[header_row.index('Forældelsesdato')]
         if date is None:
             return False
 
@@ -93,7 +94,7 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
         return True
 
-    sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row[header_row.index('Forældelsesdato')])]
+    sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row)]
 
     # Step 13: Move rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to sag_indholdsart
     index = 0
