@@ -17,7 +17,7 @@ def _load_excel_files(path):
     header_row = next(rows)
     rows = list(rows)  # convert to list, because generator cannot be pickled
 
-    return rows, header_row
+    return dict(rows=rows, header=header_row)
 
 # pylint: disable=(too-many-branches)
 def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
@@ -31,17 +31,16 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
         Filtered rows from the Excel files.
     """
 
-    results = []
-    for path in paths:
-        results.append(_load_excel_files(path))
-
-
-    header_row = results[0][1]
     # Step 1: Merge files to one list of rows
+    sheets = []
+    for path in paths:
+        sheets.append(_load_excel_files(path))
+
+    header_row = sheets[0]['header']
     rows = []
-    for row in [rows[0] for rows in results]:
-        rows.extend(row)
-    del results
+    for sheet in sheets:
+        rows.extend(sheet['rows'])
+    del sheets
 
     hovedstole = []
     sagsomkostninger = []
