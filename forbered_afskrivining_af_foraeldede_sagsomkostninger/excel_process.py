@@ -17,7 +17,7 @@ def _load_excel_files(path):
     header_row = next(rows)
     rows = list(rows)  # convert to list, because generator cannot be pickled
 
-    return dict(rows=rows, header=header_row)
+    return {'rows': rows, 'header': header_row}
 
 # pylint: disable=(too-many-branches)
 def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
@@ -108,7 +108,7 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
     # pylint: disable-next=(consider-using-set-comprehension)
-    unique = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
+    unique = set((row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole)
     # remove rows from sagsomkostninger that do not have matching (FP, aftale) i hovedstole.
     not_special_content_type_rows = [row for row in not_special_content_type_rows if
                         (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in unique]
