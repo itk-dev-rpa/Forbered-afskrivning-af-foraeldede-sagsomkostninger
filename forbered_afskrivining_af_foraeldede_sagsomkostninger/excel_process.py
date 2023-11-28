@@ -37,7 +37,7 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
 
     header_row = results[0][1]
-
+    # Step 1: Merge files to one list of rows
     rows = []
     for row in [rows[0] for rows in results]:
         rows.extend(row)
