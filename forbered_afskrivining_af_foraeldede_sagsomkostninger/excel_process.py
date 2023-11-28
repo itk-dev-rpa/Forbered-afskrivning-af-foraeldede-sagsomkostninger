@@ -44,7 +44,6 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
     hovedstole = []
     sagsomkostninger = []
-    sag_indholdsart = []
 
     for row in rows:
         # Step 2: Delete rows where Medhæfter is not empty
@@ -95,34 +94,37 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
     sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row)]
 
-    # Step 13: Move rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to sag_indholdsart
-    index = 0
-    while index < len(sagsomkostninger):
-        if sagsomkostninger[index][header_row.index('Indholdsart')] in ['DAGI', 'DAG2', 'SFO2']:
-            # remove row from sagsomkostninger
-            sag_indholdsart.append(sagsomkostninger.pop(index))
+    # Step 13: Split rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to special_content_type_rows and not_special[...]
+    special_content_type_rows = []
+    not_special_content_type_rows = []
+
+    for row in sagsomkostninger:
+        if row[header_row.index('Indholdsart')] in ['DAGI', 'DAG2', 'SFO2']:
+            special_content_type_rows.append(row)
         else:
-            index += 1  # Move to the next item in the list
+            not_special_content_type_rows.append(row)
+
+
     # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
     # pylint: disable-next=(consider-using-set-comprehension)
     right = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
     # remove rows from sagsomkostninger that do not have matching (FP, aftale) i hovedstole.
-    sagsomkostninger = [row for row in sagsomkostninger if
+    not_special_content_type_rows = [row for row in not_special_content_type_rows if
                         (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in right]
 
     # Step 15: Combine lists
-    sagsomkostninger.extend(sag_indholdsart)
+    not_special_content_type_rows.extend(special_content_type_rows)
 
     # Step 16: Delete rows where RIM Aftale == 'IN' and RIM aftalestatus == 21
     _sagsomkostninger = []
-    for row in sagsomkostninger:
+    for row in not_special_content_type_rows:
         if row[header_row.index('RIM Aftale')] == 'IN' and row[header_row.index('RIM aftalestatus')] == '21':
             continue
         _sagsomkostninger.append(row)
 
-    sagsomkostninger = _sagsomkostninger
+    not_special_content_type_rows = _sagsomkostninger
 
     # reduce to three rows: Aftale, Bilagsnummer, FP
     return [(row[header_row.index('Aftale')], row[header_row.index('Bilagsnummer')], row[header_row.index('ForretnPartner')]) for row in
-            sagsomkostninger]
+            not_special_content_type_rows]
