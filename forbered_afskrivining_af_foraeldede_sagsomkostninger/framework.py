@@ -43,7 +43,7 @@ def main():
             error_count += 1
             error_type = type(error).__name__
             orchestrator_connection.log_error(f"Error caught during process. Number of errors caught: {error_count}. {error_type}: {error}\nTrace: {traceback.format_exc()}")
-            error_screenshot.send_error_screenshot(error_email, error, orchestrator_connection.process_name)
+            error_screenshot.send_error_screenshot(error_email.value, error, orchestrator_connection.process_name)
 
     reset.kill_all()
 
