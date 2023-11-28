@@ -7,7 +7,6 @@ This script is designed to be executed as the main entry point for the automatio
 import traceback
 import sys
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from forbered_afskrivining_af_foraeldede_sagsomkostninger import get_constants
 from forbered_afskrivining_af_foraeldede_sagsomkostninger import reset
 from forbered_afskrivining_af_foraeldede_sagsomkostninger import error_screenshot
 from forbered_afskrivining_af_foraeldede_sagsomkostninger import process
@@ -23,7 +22,7 @@ def main():
     orchestrator_connection.log_trace("Process started.")
 
     orchestrator_connection.log_trace("Getting constants.")
-    constants = get_constants.get_constants(orchestrator_connection)
+    error_email = orchestrator_connection.get_constant(config.ERROR_EMAIL)
 
     error_count = 0
     for _ in range(config.MAX_RETRY_COUNT):
@@ -32,7 +31,7 @@ def main():
             reset.reset(orchestrator_connection)
 
             orchestrator_connection.log_trace("Running process.")
-            process.process(orchestrator_connection, constants)
+            process.process(orchestrator_connection)
 
             break
 
@@ -44,7 +43,7 @@ def main():
             error_count += 1
             error_type = type(error).__name__
             orchestrator_connection.log_error(f"Error caught during process. Number of errors caught: {error_count}. {error_type}: {error}\nTrace: {traceback.format_exc()}")
-            error_screenshot.send_error_screenshot(constants.error_email, error, orchestrator_connection.process_name)
+            error_screenshot.send_error_screenshot(error_email, error, orchestrator_connection.process_name)
 
     reset.kill_all()
 

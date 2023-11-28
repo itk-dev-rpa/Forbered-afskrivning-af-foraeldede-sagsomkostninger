@@ -9,11 +9,10 @@ from itk_dev_shared_components.graph import authentication, mail
 from forbered_afskrivining_af_foraeldede_sagsomkostninger.auxiliary import TemporaryFile, get_fp_and_aftale_from_file
 from forbered_afskrivining_af_foraeldede_sagsomkostninger.excel_process import read_sheet
 from forbered_afskrivining_af_foraeldede_sagsomkostninger import config
-from forbered_afskrivining_af_foraeldede_sagsomkostninger.get_constants import Constants
 from forbered_afskrivining_af_foraeldede_sagsomkostninger.exceptions import BusinessError
 
 
-def process(orchestrator_connection: OrchestratorConnection, constants: Constants) -> None:
+def process(orchestrator_connection: OrchestratorConnection) -> None:
     """
     0. Establish Graph access
     1. GRAPH get emails
@@ -23,7 +22,7 @@ def process(orchestrator_connection: OrchestratorConnection, constants: Constant
     5. Insert results into job queue
     6. Delete emails
     """
-    gc = constants.graph_credentials
+    gc = orchestrator_connection.get_credential(config.GRAPH_CREDENTIALS)
     graph_access = authentication.authorize_by_username_password(username=gc.username, **json.loads(gc.password))
 
     # Step 1. GRAPH get emails
