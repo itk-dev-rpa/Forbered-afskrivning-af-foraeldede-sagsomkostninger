@@ -108,10 +108,10 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
     # pylint: disable-next=(consider-using-set-comprehension)
-    right = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
+    unique = set([(row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole])
     # remove rows from sagsomkostninger that do not have matching (FP, aftale) i hovedstole.
     not_special_content_type_rows = [row for row in not_special_content_type_rows if
-                        (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in right]
+                        (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in unique]
 
     # Step 15: Combine lists
     not_special_content_type_rows.extend(special_content_type_rows)
