@@ -125,6 +125,6 @@ def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
     not_special_content_type_rows = _sagsomkostninger
 
-    # reduce to three rows: Aftale, Bilagsnummer, FP
+    # reduce to three columns: Aftale, Bilagsnummer, FP
     return [(row[header_row.index('Aftale')], row[header_row.index('Bilagsnummer')], row[header_row.index('ForretnPartner')]) for row in
             not_special_content_type_rows]
