@@ -20,7 +20,7 @@ def _load_excel_files(path):
     return {'rows': rows, 'header': header_row}
 
 # pylint: disable=(too-many-branches)
-def read_sheet(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
+def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     """This method reads all Excel files and applies the "Alteryx" filtering steps described in the PDD section 5.2.
     The KMD restanceliste from KMD, is reduced to a list of (Aftale, Bilagsnummer, FP)
 

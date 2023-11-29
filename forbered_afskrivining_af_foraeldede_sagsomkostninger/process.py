@@ -7,7 +7,7 @@ from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConn
 from itk_dev_shared_components.sap import multi_session
 from itk_dev_shared_components.graph import authentication, mail
 from forbered_afskrivining_af_foraeldede_sagsomkostninger.auxiliary import TemporaryFile, get_fp_and_aftale_from_file
-from forbered_afskrivining_af_foraeldede_sagsomkostninger.excel_process import read_sheet
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.excel_process import read_sheets
 from forbered_afskrivining_af_foraeldede_sagsomkostninger import config
 from forbered_afskrivining_af_foraeldede_sagsomkostninger.exceptions import BusinessError
 
@@ -29,7 +29,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     attachment_bytes_list, kmd_emails = get_emails(orchestrator_connection, graph_access)
 
     # Step 2. Treat excel files according to alteryx rules
-    sagsomkostninger = read_sheet(attachment_bytes_list)
+    sagsomkostninger = read_sheets(attachment_bytes_list)
 
     for att in attachment_bytes_list:
         att.close()
