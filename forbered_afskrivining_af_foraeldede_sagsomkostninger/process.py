@@ -40,7 +40,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     fp_aftale = get_fp_and_aftale_from_file(file_content)
 
     # Step 4. Filter excel output
-    # delete row from sagsomkostninger of fp and aftale is in rykkersprre dict.
+    # skip rows from sagsomkostninger if FP and Aftale is in rykkerspærre dict.
     reduced_sagsomkostninger = []
     for row in sagsomkostninger:
         restance_aftale = row[0]
