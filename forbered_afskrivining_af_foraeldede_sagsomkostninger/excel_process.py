@@ -55,33 +55,33 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
             continue
 
 
-        # Step 5: Slet rækker hvor indholdsart er på listen (e.g. BØVO.)
+        # Step 4: Slet rækker hvor indholdsart er på listen (e.g. BØVO.)
         if row[header_row.index('Indholdsart')] in REMOVE_INDHOLDSART:
             continue
 
-        # Step 6: Delete rows where Aftale type is not empty
+        # Step 5: Delete rows where Aftale type is not empty
         if row[header_row.index('Aftale type')] is not None:
             continue
 
-        # Step 7: new lists
+        # Step 6: Skip.
 
-        # Step 8: Move rows with ZGBY or ZREN to sagsomkostninger
+        # Step 7: Move rows with ZGBY or ZREN to sagsomkostninger
         if row[header_row.index('Hovedtransakt.')] in ('ZGBY', 'ZREN'):
             sagsomkostninger.append(row)
             continue
 
-        # Step 9: Move rows with Ratespecifikation LRT to sagsomkostnigner.
+        # Step 8: Move rows with Ratespecifikation LRT to sagsomkostnigner.
         if row[header_row.index('Ratespecifikation')] == 'LRT':
             sagsomkostninger.append(row)
-        else:  # Step 10: remaining rows, I.E. all, where Ratespecifikation is not LRT goes to hovedstole.
+        else:  # Step 9: remaining rows, I.E. all, where Ratespecifikation is not LRT goes to hovedstole.
             hovedstole.append(row)
 
         # exit loop
 
-    # Step 11: Delete row from sagsomkostninger if "RykkespærÅrsag" is 'N'.
+    # Step 10: Delete row from sagsomkostninger if "RykkespærÅrsag" is 'N'.
     sagsomkostninger = [row for row in sagsomkostninger if row[header_row.index('RykkespærÅrsag')] != 'N']
 
-    # Step 12: Delete row from sagsomkostninger if Forældelse is None or later than today.
+    # Step 11: Delete row from sagsomkostninger if Forældelse is None or later than today.
     def _expirey_date_passed(row):
         date = row[header_row.index('Forældelsesdato')]
         if date is None:
@@ -94,7 +94,7 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
 
     sagsomkostninger = [row for row in sagsomkostninger if _expirey_date_passed(row)]
 
-    # Step 13: Split rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to special_content_type_rows and not_special[...]
+    # Step 12: Split rows with "Indholdsart" ['DAGI', 'DAG2', 'SFO2'] to special_content_type_rows and not_special[...]
     special_content_type_rows = []
     not_special_content_type_rows = []
 
@@ -105,7 +105,7 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
             not_special_content_type_rows.append(row)
 
 
-    # Step 14: select sagsomkostninger and hovedstole. match FP and Aftale
+    # Step 13: select sagsomkostninger and hovedstole. match FP and Aftale
     # create set of (FP,aftale) from hovedstole
     # pylint: disable-next=(consider-using-set-comprehension)
     unique = set((row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) for row in hovedstole)
@@ -113,10 +113,10 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
     not_special_content_type_rows = [row for row in not_special_content_type_rows if
                         (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in unique]
 
-    # Step 15: Combine lists
+    # Step 14: Combine lists
     not_special_content_type_rows.extend(special_content_type_rows)
 
-    # Step 16: Delete rows where RIM Aftale == 'IN' and RIM aftalestatus == 21
+    # Step 15: Delete rows where RIM Aftale == 'IN' and RIM aftalestatus == 21
     _sagsomkostninger = []
     for row in not_special_content_type_rows:
         if row[header_row.index('RIM Aftale')] == 'IN' and row[header_row.index('RIM aftalestatus')] == '21':
