@@ -54,8 +54,7 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
         if row[header_row.index('RIM Aftale')] == 'MO' and row[header_row.index('RIM aftalestatus')] == '28':
             continue
 
-
-        # Step 4: Slet rækker hvor indholdsart er på listen (e.g. BØVO.)
+        # Step 4: delete rows where indholdsart is on the list (e.g. BØVO.)
         if row[header_row.index('Indholdsart')] in REMOVE_INDHOLDSART:
             continue
 
