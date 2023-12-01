@@ -46,10 +46,8 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         restance_aftale = row[0]
         restance_fp = row[2]
         if restance_fp in fp_aftale:
-            if restance_aftale in fp_aftale[restance_fp]:
-                continue  # Skip row: the fp, aftale combo is in rykkerspærrer.
-
-        reduced_sagsomkostninger.append(row)  # row not in rykkerspærrer.
+            if restance_aftale not in fp_aftale[restance_fp]:
+                reduced_sagsomkostninger.append(row)  # row not in rykkerspærrer.
 
     # Step 5. Insert results into job queue.
     reference_list = [None]*len(reduced_sagsomkostninger)
