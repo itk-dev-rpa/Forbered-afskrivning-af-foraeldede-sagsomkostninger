@@ -55,7 +55,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
                                 for row in reduced_sagsomkostninger]
     orchestrator_connection.bulk_create_queue_elements(queue_name=config.QUEUE_NAME, data=reduced_sagsomkostninger,
                                                        references=reference_list)
-    orchestrator_connection.log_trace(f"Inserted {len(reduced_sagsomkostninger)} job queue elements.")
+    orchestrator_connection.log_info(f"Inserted {len(reduced_sagsomkostninger)} job queue elements.")
 
     # Step 6. Delete emails.
     for email in kmd_emails:
@@ -115,7 +115,9 @@ def get_emails(orchestrator_connection: OrchestratorConnection, graph_access: au
         BusinessError: When no emails were found.
         ValueError: When attachments are missing.
     """
-    mails = mail.get_emails_from_folder('itk-rpa@mkb.aarhus.dk', 'Indbakke/Afskrivning af forældede sagsomkostninger', graph_access)
+    user = 'itk-rpa@mkb.aarhus.dk'
+    folder_path = "Indbakke/Afskrivning af forældede sagsomkostninger"
+    mails = mail.get_emails_from_folder(user, folder_path, graph_access)
 
     kmd_mails = [email for email in mails if
                  email.has_attachments and email.subject.startswith('Liste til forældede sagsomkostninger') and email.sender == 'kan-ikke-besvares@kmd.dk']
@@ -133,5 +135,7 @@ def get_emails(orchestrator_connection: OrchestratorConnection, graph_access: au
 
     orchestrator_connection.log_trace(f"Downloading {len(latest_attachments)} excel attachments with date {latest_file_date}.")
     attachment_bytes_list = [mail.get_attachment_data(attachment, graph_access) for attachment in attachments]
+
+    orchestrator_connection.log_info(f"Found {len(kmd_mails)} in '{folder_path}' to {user}.")
 
     return attachment_bytes_list, kmd_mails
