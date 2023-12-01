@@ -113,17 +113,17 @@ def read_sheets(paths: list[str] | list[BytesIO]) -> list[tuple[str, str, str]]:
                         (row[header_row.index('ForretnPartner')], row[header_row.index('Aftale')]) not in unique]
 
     # Step 14: Combine lists
-    not_special_content_type_rows.extend(special_content_type_rows)
+    combined_list = not_special_content_type_rows + special_content_type_rows
 
     # Step 15: Delete rows where RIM Aftale == 'IN' and RIM aftalestatus == 21
     _sagsomkostninger = []
-    for row in not_special_content_type_rows:
+    for row in combined_list:
         if row[header_row.index('RIM Aftale')] == 'IN' and row[header_row.index('RIM aftalestatus')] == '21':
             continue
         _sagsomkostninger.append(row)
 
-    not_special_content_type_rows = _sagsomkostninger
+    combined_list = _sagsomkostninger
 
     # reduce to three columns: Aftale, Bilagsnummer, FP
     return [(row[header_row.index('Aftale')], row[header_row.index('Bilagsnummer')], row[header_row.index('ForretnPartner')]) for row in
-            not_special_content_type_rows]
+            combined_list]
