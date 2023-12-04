@@ -3,7 +3,7 @@ They initiate required applications and resources before execution, ensuring a c
 """
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from itk_dev_shared_components.sap import sap_login
-from config import SAP_CREDENTIALS
+from forbered_afskrivining_af_foraeldede_sagsomkostninger.config import SAP_CREDENTIALS
 
 def reset(orchestrator_connection:OrchestratorConnection) -> None:
     """Clean up, close/kill all programs and start them again. """
