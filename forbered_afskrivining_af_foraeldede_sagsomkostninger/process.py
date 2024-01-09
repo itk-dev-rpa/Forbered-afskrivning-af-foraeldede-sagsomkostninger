@@ -50,12 +50,13 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
                 reduced_sagsomkostninger.append(row)  # row not in rykkerspærrer.
 
     # Step 5. Insert results into job queue.
-    reference_list = [None]*len(reduced_sagsomkostninger)
-    reduced_sagsomkostninger = [json.dumps(dict(zip(['aftale', 'bilagsnummer', 'fp'], row)))
-                                for row in reduced_sagsomkostninger]
-    orchestrator_connection.bulk_create_queue_elements(queue_name=config.QUEUE_NAME, data=reduced_sagsomkostninger,
-                                                       references=reference_list)
-    orchestrator_connection.log_info(f"Inserted {len(reduced_sagsomkostninger)} job queue elements.")
+    if len(reduced_sagsomkostninger) != 0:
+        reference_list = [None]*len(reduced_sagsomkostninger)
+        reduced_sagsomkostninger = [json.dumps(dict(zip(['aftale', 'bilagsnummer', 'fp'], row))) for row in reduced_sagsomkostninger]
+        orchestrator_connection.bulk_create_queue_elements(queue_name=config.QUEUE_NAME, data=reduced_sagsomkostninger, references=reference_list)
+        orchestrator_connection.log_info(f"Inserted {len(reduced_sagsomkostninger)} job queue elements.")
+    else:
+        orchestrator_connection.log_info("No relevant cases found. No new queue elements created.")
 
     # Step 6. Delete emails.
     for email in kmd_emails:
