@@ -16,7 +16,7 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
 ]
 dependencies = [
-    "OpenOrchestrator",
+    "OpenOrchestrator == 2.*",
     "Pillow",
     "ITK-dev-shared-components >= 1.0.0",
     "openpyxl <= 3.1.2"
