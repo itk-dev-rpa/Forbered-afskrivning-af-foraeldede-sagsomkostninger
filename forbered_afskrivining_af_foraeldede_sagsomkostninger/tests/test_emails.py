@@ -28,6 +28,3 @@ class IntegrationTestEmails(unittest.TestCase):
         attachment_bytes_list, kmd_emails = get_emails(orchestrator_connection=mock_open_rchestrator, graph_access=graph_access)
         self.assertIsNotNone(attachment_bytes_list)
         self.assertIsNotNone(kmd_emails)
-
-if __name__ == '__main__':
-    unittest.main()
